@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Administration Dashboard</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- DataTables Bootstrap 5 -->
+    <link
+      href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --sidebar-width: 250px;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding-top: 56px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed {
+        margin-left: calc(-1 * var(--sidebar-width));
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s;
+      }
+
+      .main-content.expanded {
+        margin-left: 0;
+      }
+
+      .stat-card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .material-card {
+        transition: all 0.3s;
+      }
+
+      .material-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+
+        .sidebar.show {
+          margin-left: 0;
+        }
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .table-search {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .sortable {
+        cursor: pointer;
+        position: relative;
+      }
+
+      .sortable:after {
+        content: "↕";
+        position: absolute;
+        right: 8px;
+      }
+
+      .sortable.asc:after {
+        content: "↑";
+      }
+
+      .sortable.desc:after {
+        content: "↓";
+      }
+
+      .table-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+      }
+      .table-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      [data-table-row] {
+        transition: opacity 0.3s;
+      }
+
+      [data-table-row].hidden {
+        display: none;
+      }
+    </style>
+    <style>
+      :root {
+        --sidebar-width: 250px;
+        --primary-blue: #0d6efd;
+      }
+
+      /* Base layout styles */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding-top: 56px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        transition: all 0.3s;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s;
+      }
+
+      /* Materials specific styles */
+      .materials-header {
+        background: linear-gradient(
+          rgba(13, 110, 253, 0.9),
+          rgba(13, 110, 253, 0.7)
+        );
+        color: white;
+        padding: 2rem;
+        margin: -20px -20px 20px -20px;
+      }
+
+      .filter-card {
+        position: sticky;
+        top: 20px;
+      }
+
+      .material-card {
+        transition: transform 0.2s;
+        height: 100%;
+      }
+
+      .material-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+      }
+
+      .material-image {
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .filter-group {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .filter-group:last-child {
+        border-bottom: none;
+      }
+
+      .chip {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+        border-radius: 1rem;
+        background-color: #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .chip:hover {
+        background-color: #dee2e6;
+      }
+
+      .chip.active {
+        background-color: var(--primary-blue);
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .materials-header {
+          text-align: center;
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container-fluid">
+        <button class="btn btn-link text-light" id="sidebarToggle">
+          <i class="bi bi-list"></i>
+        </button>
+        <a class="navbar-brand ms-2" href="./index.html">Project Admin</a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="bi bi-person-circle"></i>
+                Admin
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-person"></i> Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-gear"></i> Settings</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-box-arrow-right"></i> Logout</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="list-group list-group-flush">
+        <a
+          href="./dashboard.html"
+          class="list-group-item list-group-item-action active"
+        >
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+        <a
+          href="./team_listings.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-people me-2"></i> Team
+        </a>
+        <a
+          href="./materials_listings.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-box me-2"></i> Materials
+        </a>
+        <a
+          href="./project_details.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-file-text me-2"></i> Project Details
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Materials Header -->
+      <div class="materials-header">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#" class="text-white">Home</a>
+            </li>
+            <li class="breadcrumb-item active text-white" aria-current="page">
+              Materials
+            </li>
+          </ol>
+        </nav>
+        <div
+          class="d-flex justify-content-between align-items-center flex-wrap"
+        >
+          <h1 class="display-5 mb-0">Materials</h1>
+          <button class="btn btn-light mt-2 mt-sm-0">
+            <i class="bi bi-plus-lg me-2"></i>Add New Material
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3">
+          <div class="card filter-card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="card-title mb-0">Filters</h5>
+              <button class="btn btn-link btn-sm p-0">Clear All</button>
+            </div>
+            <div class="card-body">
+              <!-- Search -->
+              <div class="filter-group">
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search materials..."
+                  />
+                </div>
+              </div>
+
+              <!-- Status Filter -->
+              <div class="filter-group">
+                <h6 class="mb-2">Status</h6>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="statusAvailable"
+                    checked
+                  />
+                  <label class="form-check-label" for="statusAvailable">
+                    Available
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="statusInUse"
+                  />
+                  <label class="form-check-label" for="statusInUse">
+                    In Use
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="statusMaintenance"
+                  />
+                  <label class="form-check-label" for="statusMaintenance">
+                    Under Maintenance
+                  </label>
+                </div>
+              </div>
+
+              <!-- Category Filter -->
+              <div class="filter-group">
+                <h6 class="mb-2">Category</h6>
+                <div class="chip active">Laboratory</div>
+                <div class="chip">Electronics</div>
+                <div class="chip">Software</div>
+                <div class="chip">Hardware</div>
+                <div class="chip">Tools</div>
+              </div>
+
+              <!-- Sort By -->
+              <div class="filter-group">
+                <h6 class="mb-2">Sort By</h6>
+                <select class="form-select">
+                  <option selected>Name (A-Z)</option>
+                  <option>Name (Z-A)</option>
+                  <option>Status</option>
+                  <option>Recently Added</option>
+                  <option>Most Used</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Materials Grid -->
+        <div class="col-lg-9">
+          <div class="row g-4">
+            <!-- Material Card -->
+            <div class="col-md-6 col-xl-4">
+              <div class="card material-card">
+                <div class="status-badge">
+                  <span class="badge bg-success">Available</span>
+                </div>
+                <img
+                  src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'><rect width='100%' height='100%' fill='%23777'/></svg>"
+                  class="card-img-top material-image"
+                  alt="Material"
+                />
+                <div class="card-body">
+                  <h5 class="card-title">Laboratory Equipment XYZ</h5>
+                  <p class="card-text text-muted mb-3">
+                    High-precision measurement device for advanced research
+                    applications
+                  </p>
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span class="badge bg-light text-dark">Laboratory</span>
+                    <button class="btn btn-primary btn-sm">View Details</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- More Material Cards -->
+            <div class="col-md-6 col-xl-4">
+              <div class="card material-card">
+                <div class="status-badge">
+                  <span class="badge bg-warning">In Use</span>
+                </div>
+                <img
+                  src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'><rect width='100%' height='100%' fill='%23666'/></svg>"
+                  class="card-img-top material-image"
+                  alt="Material"
+                />
+                <div class="card-body">
+                  <h5 class="card-title">Digital Oscilloscope</h5>
+                  <p class="card-text text-muted mb-3">
+                    Professional grade oscilloscope for electronic signal
+                    analysis
+                  </p>
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span class="badge bg-light text-dark">Electronics</span>
+                    <button class="btn btn-primary btn-sm">View Details</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+              <div class="card material-card">
+                <div class="status-badge">
+                  <span class="badge bg-danger">Maintenance</span>
+                </div>
+                <img
+                  src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'><rect width='100%' height='100%' fill='%23555'/></svg>"
+                  class="card-img-top material-image"
+                  alt="Material"
+                />
+                <div class="card-body">
+                  <h5 class="card-title">Spectrum Analyzer</h5>
+                  <p class="card-text text-muted mb-3">
+                    Advanced spectrum analysis tool for RF measurements
+                  </p>
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span class="badge bg-light text-dark">Electronics</span>
+                    <button class="btn btn-primary btn-sm">View Details</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">Previous</a>
+              </li>
+              <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+              </li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast" role="alert" id="notificationToast">
+        <div class="toast-header">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong class="me-auto">Notification</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+        <div class="toast-body">Action completed successfully!</div>
+      </div>
+    </div>
+
+    <!-- Required JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Search functionality
+        const searchInput = document.getElementById("tableSearch");
+        const filterSelect = document.getElementById("tableFilter");
+        const table = document.getElementById("membersTable");
+        const rows = table.querySelectorAll("[data-table-row]");
+
+        function updateTable() {
+          const searchTerm = searchInput.value.toLowerCase();
+          const filterValue = filterSelect.value.toLowerCase();
+          let visibleCount = 0;
+
+          rows.forEach((row) => {
+            const name = row
+              .querySelector('[data-field="name"]')
+              .textContent.toLowerCase();
+            const role = row
+              .querySelector('[data-field="role"]')
+              .textContent.toLowerCase();
+            const matchesSearch = name.includes(searchTerm);
+            const matchesFilter =
+              filterValue === "" || role.includes(filterValue);
+
+            if (matchesSearch && matchesFilter) {
+              row.classList.remove("hidden");
+              visibleCount++;
+            } else {
+              row.classList.add("hidden");
+            }
+          });
+
+          document.getElementById("visibleCount").textContent = visibleCount;
+          document.getElementById("totalCount").textContent = rows.length;
+        }
+
+        // Sorting functionality
+        const sortableHeaders = document.querySelectorAll(".sortable");
+        sortableHeaders.forEach((header) => {
+          header.addEventListener("click", function () {
+            const field = this.getAttribute("data-sort");
+            const isAsc = !this.classList.contains("asc");
+
+            // Remove sorting classes from all headers
+            sortableHeaders.forEach((h) => {
+              h.classList.remove("asc", "desc");
+            });
+
+            // Add sorting class to clicked header
+            this.classList.add(isAsc ? "asc" : "desc");
+
+            // Sort rows
+            const rowsArray = Array.from(rows);
+            rowsArray.sort((a, b) => {
+              const aValue = a.querySelector(
+                `[data-field="${field}"]`
+              ).textContent;
+              const bValue = b.querySelector(
+                `[data-field="${field}"]`
+              ).textContent;
+              return isAsc
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+            });
+
+            // Reorder rows in the table
+            rowsArray.forEach((row) => {
+              table.querySelector("tbody").appendChild(row);
+            });
+          });
+        });
+
+        // Event listeners
+        searchInput.addEventListener("input", updateTable);
+        filterSelect.addEventListener("change", updateTable);
+
+        // Initialize table
+        updateTable();
+      });
+
+      // Sidebar Toggle
+      document
+        .getElementById("sidebarToggle")
+        .addEventListener("click", function () {
+          document.getElementById("sidebar").classList.toggle("collapsed");
+          document.getElementById("mainContent").classList.toggle("expanded");
+        });
+
+      // Show loading overlay
+      function showLoading() {
+        document.querySelector(".loading-overlay").style.display = "flex";
+      }
+
+      // Hide loading overlay
+      function hideLoading() {
+        document.querySelector(".loading-overlay").style.display = "none";
+      }
+
+      // Show toast notification
+      function showNotification(message, type = "success") {
+        const toast = document.getElementById("notificationToast");
+        const toastBody = toast.querySelector(".toast-body");
+        toastBody.textContent = message;
+
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+      }
+
+      // Example of showing loading state
+      document.querySelectorAll(".btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          showLoading();
+          setTimeout(hideLoading, 1000); // Simulate loading
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<!-- modified code -->

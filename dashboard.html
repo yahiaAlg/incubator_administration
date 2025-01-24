@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Administration Dashboard</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- DataTables Bootstrap 5 -->
+    <link
+      href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --sidebar-width: 250px;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding-top: 56px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed {
+        margin-left: calc(-1 * var(--sidebar-width));
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s;
+      }
+
+      .main-content.expanded {
+        margin-left: 0;
+      }
+
+      .stat-card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .material-card {
+        transition: all 0.3s;
+      }
+
+      .material-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+
+        .sidebar.show {
+          margin-left: 0;
+        }
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .table-search {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .sortable {
+        cursor: pointer;
+        position: relative;
+      }
+
+      .sortable:after {
+        content: "↕";
+        position: absolute;
+        right: 8px;
+      }
+
+      .sortable.asc:after {
+        content: "↑";
+      }
+
+      .sortable.desc:after {
+        content: "↓";
+      }
+
+      .table-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+      }
+      .table-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      [data-table-row] {
+        transition: opacity 0.3s;
+      }
+
+      [data-table-row].hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container-fluid">
+        <button class="btn btn-link text-light" id="sidebarToggle">
+          <i class="bi bi-list"></i>
+        </button>
+        <a class="navbar-brand ms-2" href="./index.html">Project Admin</a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="bi bi-person-circle"></i>
+                Admin
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-person"></i> Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-gear"></i> Settings</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-box-arrow-right"></i> Logout</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="list-group list-group-flush">
+        <a
+          href="./dashboard.html"
+          class="list-group-item list-group-item-action active"
+        >
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+        <a
+          href="./team_listings.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-people me-2"></i> Team
+        </a>
+        <a
+          href="./materials_listings.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-box me-2"></i> Materials
+        </a>
+        <a
+          href="./project_details.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-file-text me-2"></i> Project Details
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+      </nav>
+      <!-- Dashboard Overview -->
+      <div class="row m-4">
+        <div class="col-md-3 mb-3">
+          <div class="card stat-card bg-primary text-white">
+            <div class="card-body">
+              <h6 class="card-title">Team Members</h6>
+              <h2 class="card-text">12</h2>
+              <i
+                class="bi bi-people position-absolute bottom-0 end-0 mb-3 me-3 opacity-50"
+                style="font-size: 2rem"
+              ></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card stat-card bg-success text-white">
+            <div class="card-body">
+              <h6 class="card-title">Materials</h6>
+              <h2 class="card-text">45</h2>
+              <i
+                class="bi bi-box position-absolute bottom-0 end-0 mb-3 me-3 opacity-50"
+                style="font-size: 2rem"
+              ></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card stat-card bg-warning text-white">
+            <div class="card-body">
+              <h6 class="card-title">Completion</h6>
+              <h2 class="card-text">75%</h2>
+              <i
+                class="bi bi-graph-up position-absolute bottom-0 end-0 mb-3 me-3 opacity-50"
+                style="font-size: 2rem"
+              ></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card stat-card bg-info text-white">
+            <div class="card-body">
+              <h6 class="card-title">Days Remaining</h6>
+              <h2 class="card-text">30</h2>
+              <i
+                class="bi bi-calendar position-absolute bottom-0 end-0 mb-3 me-3 opacity-50"
+                style="font-size: 2rem"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Members Section -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Team Members</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-controls">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                id="tableSearch"
+                placeholder="Search members..."
+                data-search-table="membersTable"
+              />
+            </div>
+            <select class="form-select w-auto" id="tableFilter">
+              <option value="">All Roles</option>
+              <option value="Leader">Leaders</option>
+              <option value="Member">Members</option>
+            </select>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover" id="membersTable">
+              <thead>
+                <tr>
+                  <th class="sortable" data-sort="name">Name</th>
+                  <th class="sortable" data-sort="faculty">Faculty</th>
+                  <th class="sortable" data-sort="specialty">Specialty</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th class="sortable" data-sort="role">Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-table-row>
+                  <td data-field="name">John Doe</td>
+                  <td data-field="faculty">Engineering</td>
+                  <td data-field="specialty">Software</td>
+                  <td>123-456-7890</td>
+                  <td>john@example.com</td>
+                  <td data-field="role">
+                    <span class="badge bg-primary">Leader</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-info">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr data-table-row>
+                  <td data-field="name">Jane Smith</td>
+                  <td data-field="faculty">Science</td>
+                  <td data-field="specialty">Research</td>
+                  <td>123-456-7891</td>
+                  <td>jane@example.com</td>
+                  <td data-field="role">
+                    <span class="badge bg-info">Member</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-info">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Add more sample rows as needed -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-pagination">
+            <div class="page-info">
+              Showing <span id="visibleCount">2</span> of
+              <span id="totalCount">2</span> entries
+            </div>
+            <select class="rows-per-page form-select w-25">
+              <option value="5">5 per page</option>
+              <option value="10" selected>10 per page</option>
+              <option value="25">25 per page</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials Section -->
+      <div class="row mb-4">
+        <div class="col-12 mb-3">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="card-title mb-0">Materials</h5>
+              <div>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  placeholder="Search materials..."
+                />
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <!-- Sample Material Card -->
+                <div class="col-md-4 mb-3">
+                  <div class="card material-card h-100">
+                    <div class="status-badge">
+                      <span class="badge bg-success">Available</span>
+                    </div>
+                    <img
+                      src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' class='h-100 w-100' preserveAspectRatio='none' viewBox='0 0 100 100'><rect width='100%' height='100%' fill='%23ccc'/></svg>"
+                      class="card-img-top"
+                      alt="Material"
+                    />
+                    <div class="card-body">
+                      <h5 class="card-title">Material Name</h5>
+                      <p class="card-text">
+                        Brief description of the material goes here.
+                      </p>
+                      <a
+                        href="./single_material.html"
+                        class="btn btn-primary btn-sm"
+                      >
+                        View Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast" role="alert" id="notificationToast">
+        <div class="toast-header">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong class="me-auto">Notification</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+        <div class="toast-body">Action completed successfully!</div>
+      </div>
+    </div>
+
+    <!-- Required JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Search functionality
+        const searchInput = document.getElementById("tableSearch");
+        const filterSelect = document.getElementById("tableFilter");
+        const table = document.getElementById("membersTable");
+        const rows = table.querySelectorAll("[data-table-row]");
+
+        function updateTable() {
+          const searchTerm = searchInput.value.toLowerCase();
+          const filterValue = filterSelect.value.toLowerCase();
+          let visibleCount = 0;
+
+          rows.forEach((row) => {
+            const name = row
+              .querySelector('[data-field="name"]')
+              .textContent.toLowerCase();
+            const role = row
+              .querySelector('[data-field="role"]')
+              .textContent.toLowerCase();
+            const matchesSearch = name.includes(searchTerm);
+            const matchesFilter =
+              filterValue === "" || role.includes(filterValue);
+
+            if (matchesSearch && matchesFilter) {
+              row.classList.remove("hidden");
+              visibleCount++;
+            } else {
+              row.classList.add("hidden");
+            }
+          });
+
+          document.getElementById("visibleCount").textContent = visibleCount;
+          document.getElementById("totalCount").textContent = rows.length;
+        }
+
+        // Sorting functionality
+        const sortableHeaders = document.querySelectorAll(".sortable");
+        sortableHeaders.forEach((header) => {
+          header.addEventListener("click", function () {
+            const field = this.getAttribute("data-sort");
+            const isAsc = !this.classList.contains("asc");
+
+            // Remove sorting classes from all headers
+            sortableHeaders.forEach((h) => {
+              h.classList.remove("asc", "desc");
+            });
+
+            // Add sorting class to clicked header
+            this.classList.add(isAsc ? "asc" : "desc");
+
+            // Sort rows
+            const rowsArray = Array.from(rows);
+            rowsArray.sort((a, b) => {
+              const aValue = a.querySelector(
+                `[data-field="${field}"]`
+              ).textContent;
+              const bValue = b.querySelector(
+                `[data-field="${field}"]`
+              ).textContent;
+              return isAsc
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+            });
+
+            // Reorder rows in the table
+            rowsArray.forEach((row) => {
+              table.querySelector("tbody").appendChild(row);
+            });
+          });
+        });
+
+        // Event listeners
+        searchInput.addEventListener("input", updateTable);
+        filterSelect.addEventListener("change", updateTable);
+
+        // Initialize table
+        updateTable();
+      });
+
+      // Sidebar Toggle
+      document
+        .getElementById("sidebarToggle")
+        .addEventListener("click", function () {
+          document.getElementById("sidebar").classList.toggle("collapsed");
+          document.getElementById("mainContent").classList.toggle("expanded");
+        });
+
+      // Show loading overlay
+      function showLoading() {
+        document.querySelector(".loading-overlay").style.display = "flex";
+      }
+
+      // Hide loading overlay
+      function hideLoading() {
+        document.querySelector(".loading-overlay").style.display = "none";
+      }
+
+      // Show toast notification
+      function showNotification(message, type = "success") {
+        const toast = document.getElementById("notificationToast");
+        const toastBody = toast.querySelector(".toast-body");
+        toastBody.textContent = message;
+
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+      }
+
+      // Example of showing loading state
+      document.querySelectorAll(".btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          showLoading();
+          setTimeout(hideLoading, 1000); // Simulate loading
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<!-- modified code -->

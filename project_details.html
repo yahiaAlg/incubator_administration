@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Administration Dashboard</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- DataTables Bootstrap 5 -->
+    <link
+      href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --sidebar-width: 250px;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding-top: 56px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed {
+        margin-left: calc(-1 * var(--sidebar-width));
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s;
+      }
+
+      .main-content.expanded {
+        margin-left: 0;
+      }
+
+      .stat-card {
+        border-radius: 15px;
+        transition: transform 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .material-card {
+        transition: all 0.3s;
+      }
+
+      .material-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+
+        .sidebar.show {
+          margin-left: 0;
+        }
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .table-search {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .sortable {
+        cursor: pointer;
+        position: relative;
+      }
+
+      .sortable:after {
+        content: "↕";
+        position: absolute;
+        right: 8px;
+      }
+
+      .sortable.asc:after {
+        content: "↑";
+      }
+
+      .sortable.desc:after {
+        content: "↓";
+      }
+
+      .table-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+      }
+      .table-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      [data-table-row] {
+        transition: opacity 0.3s;
+      }
+
+      [data-table-row].hidden {
+        display: none;
+      }
+    </style>
+    <style>
+      :root {
+        --sidebar-width: 250px;
+        --primary-blue: #0d6efd;
+      }
+
+      /* Base layout styles remain the same */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding-top: 56px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        transition: all 0.3s;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s;
+      }
+
+      /* Project specific styles */
+      .project-header {
+        background: linear-gradient(
+          rgba(13, 110, 253, 0.9),
+          rgba(13, 110, 253, 0.7)
+        );
+        color: white;
+        padding: 2rem;
+        margin: -20px -20px 20px -20px;
+      }
+
+      .progress-lg {
+        height: 20px;
+      }
+
+      .milestone-item {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 1.5rem;
+      }
+
+      .milestone-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+      }
+
+      .milestone-item.completed::before {
+        background: #198754;
+      }
+
+      .milestone-item.pending::before {
+        background: #ffc107;
+      }
+
+      .supervisor-card {
+        border-radius: 15px;
+        overflow: hidden;
+      }
+
+      .supervisor-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto;
+      }
+
+      .contact-info i {
+        width: 24px;
+      }
+
+      .timeline-container {
+        position: relative;
+        padding-left: 30px;
+      }
+
+      .timeline-container::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--primary-blue);
+      }
+
+      @media (max-width: 768px) {
+        .project-header {
+          text-align: center;
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container-fluid">
+        <button class="btn btn-link text-light" id="sidebarToggle">
+          <i class="bi bi-list"></i>
+        </button>
+        <a class="navbar-brand ms-2" href="./index.html">Project Admin</a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="bi bi-person-circle"></i>
+                Admin
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-person"></i> Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-gear"></i> Settings</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="bi bi-box-arrow-right"></i> Logout</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="list-group list-group-flush">
+        <a
+          href="./dashboard.html"
+          class="list-group-item list-group-item-action active"
+        >
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+        <a
+          href="./team_listings.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-people me-2"></i> Team
+        </a>
+        <a
+          href="./materials_listings.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-box me-2"></i> Materials
+        </a>
+        <a
+          href="./project_details.html"
+          class="list-group-item list-group-item-action"
+        >
+          <i class="bi bi-file-text me-2"></i> Project Details
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Project Header -->
+      <div class="project-header" style="margin-top: 1rem">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#" class="text-white">Home</a>
+            </li>
+            <li class="breadcrumb-item active text-white" aria-current="page">
+              Project Details
+            </li>
+          </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
+          <div>
+            <h1 class="display-5 mb-3">Smart City Implementation Project</h1>
+            <p class="lead mb-0">
+              Urban development and technological integration initiative
+            </p>
+          </div>
+          <span class="badge bg-success fs-5 p-2">Active</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Main Content Column -->
+        <div class="col-lg-8">
+          <!-- Project Overview -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Project Overview</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-4">
+                <h6>Overall Progress</h6>
+                <div class="progress progress-lg mb-2">
+                  <div
+                    class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    style="width: 75%"
+                  >
+                    75%
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h6 class="card-title">Start Date</h6>
+                      <p class="card-text">January 1, 2024</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h6 class="card-title">Expected Completion</h6>
+                      <p class="card-text">December 31, 2024</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Description -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Description</h5>
+            </div>
+            <div class="card-body">
+              <p>
+                The Smart City Implementation Project aims to transform urban
+                infrastructure through technological integration. This
+                initiative focuses on implementing IoT sensors, data analytics,
+                and smart governance solutions to enhance city operations and
+                citizen services.
+              </p>
+              <h6 class="mt-4 mb-3">Key Objectives:</h6>
+              <ul>
+                <li>Implement smart traffic management systems</li>
+                <li>Deploy environmental monitoring sensors</li>
+                <li>Develop citizen engagement platforms</li>
+                <li>Establish data analytics center</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Milestones -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Project Milestones</h5>
+            </div>
+            <div class="card-body">
+              <div class="milestone-item completed">
+                <h6>Phase 1: Planning and Design</h6>
+                <p class="text-muted mb-0">Completed on January 31, 2024</p>
+              </div>
+              <div class="milestone-item completed">
+                <h6>Phase 2: Infrastructure Setup</h6>
+                <p class="text-muted mb-0">Completed on March 15, 2024</p>
+              </div>
+              <div class="milestone-item pending">
+                <h6>Phase 3: System Integration</h6>
+                <p class="text-muted mb-0">In Progress - Due June 30, 2024</p>
+              </div>
+              <div class="milestone-item">
+                <h6>Phase 4: Testing and Deployment</h6>
+                <p class="text-muted mb-0">Planned for September 30, 2024</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Updates -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Recent Updates</h5>
+            </div>
+            <div class="card-body">
+              <div class="timeline-container">
+                <div class="milestone-item">
+                  <h6>System Integration Milestone Reached</h6>
+                  <p class="text-muted">March 20, 2024</p>
+                  <p>
+                    Successfully completed the integration of traffic management
+                    systems with central control unit.
+                  </p>
+                </div>
+                <div class="milestone-item">
+                  <h6>New Team Members Onboarded</h6>
+                  <p class="text-muted">March 15, 2024</p>
+                  <p>Three new developers joined the project team.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Quick Actions -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary">
+                  <i class="bi bi-file-earmark-text me-2"></i>Generate Report
+                </button>
+                <button class="btn btn-outline-primary">
+                  <i class="bi bi-calendar-event me-2"></i>Schedule Meeting
+                </button>
+                <button class="btn btn-outline-primary">
+                  <i class="bi bi-share me-2"></i>Share Project
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Supervisor -->
+          <div class="card mb-4 supervisor-card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Project Supervisor</h5>
+            </div>
+            <div class="card-body text-center">
+              <img
+                src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100%' height='100%' fill='%23777'/></svg>"
+                class="supervisor-avatar mb-3"
+                alt="Supervisor"
+              />
+              <h5 class="mb-1">Dr. Sarah Johnson</h5>
+              <p class="text-muted mb-3">Head of Research Department</p>
+              <div class="contact-info text-start">
+                <p class="mb-2">
+                  <i class="bi bi-envelope me-2"></i>sarah.johnson@example.com
+                </p>
+                <p class="mb-2">
+                  <i class="bi bi-telephone me-2"></i>+1 234 567 890
+                </p>
+                <p class="mb-2">
+                  <i class="bi bi-geo-alt me-2"></i>Office: Room 401
+                </p>
+                <p class="mb-0">
+                  <i class="bi bi-clock me-2"></i>Office Hours: 9 AM - 5 PM
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Stats -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Project Statistics</h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-unstyled mb-0">
+                <li class="mb-3">
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Team Members</span>
+                    <span class="badge bg-primary">12</span>
+                  </div>
+                </li>
+                <li class="mb-3">
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Total Tasks</span>
+                    <span class="badge bg-info">45</span>
+                  </div>
+                </li>
+                <li class="mb-3">
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Completed Tasks</span>
+                    <span class="badge bg-success">32</span>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <span>Days Remaining</span>
+                    <span class="badge bg-warning">275</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast" role="alert" id="notificationToast">
+        <div class="toast-header">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong class="me-auto">Notification</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+        <div class="toast-body">Action completed successfully!</div>
+      </div>
+    </div>
+
+    <!-- Required JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Search functionality
+        const searchInput = document.getElementById("tableSearch");
+        const filterSelect = document.getElementById("tableFilter");
+        const table = document.getElementById("membersTable");
+        const rows = table.querySelectorAll("[data-table-row]");
+
+        function updateTable() {
+          const searchTerm = searchInput.value.toLowerCase();
+          const filterValue = filterSelect.value.toLowerCase();
+          let visibleCount = 0;
+
+          rows.forEach((row) => {
+            const name = row
+              .querySelector('[data-field="name"]')
+              .textContent.toLowerCase();
+            const role = row
+              .querySelector('[data-field="role"]')
+              .textContent.toLowerCase();
+            const matchesSearch = name.includes(searchTerm);
+            const matchesFilter =
+              filterValue === "" || role.includes(filterValue);
+
+            if (matchesSearch && matchesFilter) {
+              row.classList.remove("hidden");
+              visibleCount++;
+            } else {
+              row.classList.add("hidden");
+            }
+          });
+
+          document.getElementById("visibleCount").textContent = visibleCount;
+          document.getElementById("totalCount").textContent = rows.length;
+        }
+
+        // Sorting functionality
+        const sortableHeaders = document.querySelectorAll(".sortable");
+        sortableHeaders.forEach((header) => {
+          header.addEventListener("click", function () {
+            const field = this.getAttribute("data-sort");
+            const isAsc = !this.classList.contains("asc");
+
+            // Remove sorting classes from all headers
+            sortableHeaders.forEach((h) => {
+              h.classList.remove("asc", "desc");
+            });
+
+            // Add sorting class to clicked header
+            this.classList.add(isAsc ? "asc" : "desc");
+
+            // Sort rows
+            const rowsArray = Array.from(rows);
+            rowsArray.sort((a, b) => {
+              const aValue = a.querySelector(
+                `[data-field="${field}"]`
+              ).textContent;
+              const bValue = b.querySelector(
+                `[data-field="${field}"]`
+              ).textContent;
+              return isAsc
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+            });
+
+            // Reorder rows in the table
+            rowsArray.forEach((row) => {
+              table.querySelector("tbody").appendChild(row);
+            });
+          });
+        });
+
+        // Event listeners
+        searchInput.addEventListener("input", updateTable);
+        filterSelect.addEventListener("change", updateTable);
+
+        // Initialize table
+        updateTable();
+      });
+
+      // Sidebar Toggle
+      document
+        .getElementById("sidebarToggle")
+        .addEventListener("click", function () {
+          document.getElementById("sidebar").classList.toggle("collapsed");
+          document.getElementById("mainContent").classList.toggle("expanded");
+          document.querySelector(".main-content").classList.toggle("w-100");
+        });
+
+      // Show loading overlay
+      function showLoading() {
+        document.querySelector(".loading-overlay").style.display = "flex";
+      }
+
+      // Hide loading overlay
+      function hideLoading() {
+        document.querySelector(".loading-overlay").style.display = "none";
+      }
+
+      // Show toast notification
+      function showNotification(message, type = "success") {
+        const toast = document.getElementById("notificationToast");
+        const toastBody = toast.querySelector(".toast-body");
+        toastBody.textContent = message;
+
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+      }
+
+      // Example of showing loading state
+      document.querySelectorAll(".btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          showLoading();
+          setTimeout(hideLoading, 1000); // Simulate loading
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<!-- modified code -->

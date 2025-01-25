@@ -25,6 +25,9 @@ with modified dash
 https://poe.com/s/rPV6t0VS19JvBeZjpdfh
 dahsboard with forms
 
+https://poe.com/s/OTWxHmn0mSTyPnGvfZvx
+django porject structure
+
 https://poe.com/s/0KJg9NOS8Bq6iwbJ1Nw6
 
 https://poe.com/s/Yod1HXiHxIAkjKEtph4B

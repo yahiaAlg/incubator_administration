@@ -432,7 +432,7 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" id="uploadProfileImgBtn">
                   <i class="bi bi-camera me-2"></i>Change Photo
                 </button>
-                <input type="file" class="d-none" id="profilePhotoInput" accept="image/*">
+                <input type="file" class="visually-hidden" id="profilePhotoInput" accept="image/*">
               </div>
             </div>
 
@@ -559,7 +559,9 @@
         dropZone.addEventListener(eventName, unhighlight, false);
       });
       const uploadProfileImgBtn = document.querySelector("#uploadProfileImgBtn")
-      uploadProfileImgBtn.onclick = fun
+      uploadProfileImgBtn.onclick = function () {
+        document.querySelector('#profilePhotoInput').click();
+      }
       // Handle dropped files
       dropZone.addEventListener('drop', handleDrop, false);
 

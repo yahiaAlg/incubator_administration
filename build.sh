@@ -2,7 +2,7 @@
 
 # Create virtual environment
 echo "Creating virtual environment..."
-python -m venv venv
+python3 -m virtualenv venv
 source venv/bin/activate
 
 # Install required packages

@@ -10,8 +10,7 @@ from .forms import (
 from .models import ProjectMember
 from administration.models import Project
 
-from django.contrib.auth.models import User, Group
-
+from django.contrib.auth.models import Group
 def check_user_in_group(user, group_names):
   """
   Checks if a user is in any of the specified groups.
@@ -55,11 +54,11 @@ def login_view(request):
     return render(request, 'accounts/login.html', {'form': form})
 
 @login_required
-def logout_view(request):
+def logout_view(request):   
     logout(request)
     return redirect('login')
 
-
+@login_required
 def dashboard(request):
 
     group_names = ["project_leader"]
@@ -67,10 +66,10 @@ def dashboard(request):
     if check_user_in_group(request.user, group_names):
         messages.success(request,"User '{request.user.username}' is in one of the groups: {group_names}")
         return redirect(
-            "login"
+            "dashboard"
         )
     else:
-        messages.error(request,f"User '{request.user.username}' is not in any of the groups: {group_names}")
+        messages.error(request,f"User '{request.user.username}' is not : {group_names}")
         return render(request, 'accounts/project_leader_dashboard.html')
     
 

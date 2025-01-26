@@ -1,0 +1,63 @@
+/* Previous styles remain the same */
+.nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+  position: relative;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0061f2;
+  background: none;
+  border: none;
+}
+
+.nav-tabs .nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #0061f2;
+}
+
+.nav-tabs .nav-link:hover {
+  border: none;
+  color: #0061f2;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #0061f2 0%, #6900f2 100%);
+  color: white;
+  padding: 2rem;
+  margin: -20px -20px 20px -20px;
+}
+
+.upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.upload-area:hover {
+  border-color: #0d6efd;
+  background-color: #f8f9fa;
+}
+
+.upload-area.drag-over {
+  border-color: #0d6efd;
+  background-color: #f8f9fa;
+}
+
+/* Rest of your previous styles */

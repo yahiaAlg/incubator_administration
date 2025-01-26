@@ -1,0 +1,5 @@
+Django
+opencv-python
+Pillow
+python-dotenv
+django-bootstrap5

@@ -1,80 +1,21 @@
 {% extends 'base.html' %} 
+{% load static %}
+{% load django_bootstrap5 %}
 {% block title %}Dashboard{% endblock %}
 {% block extra_css %}
-  <style>
-    /* Previous styles remain the same */
-    .nav-tabs {
-      border-bottom: 2px solid #dee2e6;
-      margin-bottom: 20px;
-    }
-
-    .nav-tabs .nav-link {
-      border: none;
-      color: #6c757d;
-      padding: 1rem 1.5rem;
-      font-weight: 500;
-      position: relative;
-    }
-
-    .nav-tabs .nav-link.active {
-      color: #0061f2;
-      background: none;
-      border: none;
-    }
-
-    .nav-tabs .nav-link.active::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: #0061f2;
-    }
-
-    .nav-tabs .nav-link:hover {
-      border: none;
-      color: #0061f2;
-    }
-
-    .dashboard-header {
-      background: linear-gradient(135deg, #0061f2 0%, #6900f2 100%);
-      color: white;
-      padding: 2rem;
-      margin: -20px -20px 20px -20px;
-    }
-
-    .upload-area {
-      border: 2px dashed #dee2e6;
-      border-radius: 10px;
-      padding: 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 1rem;
-    }
-
-    .upload-area:hover {
-      border-color: #0d6efd;
-      background-color: #f8f9fa;
-    }
-
-    .upload-area.drag-over {
-      border-color: #0d6efd;
-      background-color: #f8f9fa;
-    }
-
-    /* Rest of your previous styles */
-  </style>
+  <link rel="stylesheet" href="{% static "css/project_leader_dashboard.css" %}">
 {% endblock extra_css %}
 {% block header %}
   <div class="dashboard-header">
     <div class="container-fluid">
       <div class="d-flex justify-content-between align-items-center">
         <h2 class="mb-0">Project Dashboard</h2>
-        <button class="btn btn-light" onclick="logout()">
-          <i class="bi bi-box-arrow-right me-2"></i>Logout
-        </button>
+        {% comment %} logout using form with post method   {% endcomment %}
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          {% comment %} submit logout button {% endcomment %}
+          <button type="submit" class="btn btn-sm btn-danger">Logout</button>
+        </form>
       </div>
     </div>
   </div>
@@ -503,131 +444,6 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script>
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-
-    // File upload handling
-    document.querySelector('.upload-area').addEventListener('dragover', function (e) {
-      e.preventDefault();
-      this.classList.add('border-primary');
-    });
-
-    document.querySelector('.upload-area').addEventListener('dragleave', function (e) {
-      e.preventDefault();
-      this.classList.remove('border-primary');
-    });
-
-    document.querySelector('.upload-area').addEventListener('drop', function (e) {
-      e.preventDefault();
-      this.classList.remove('border-primary');
-      // Handle file upload
-    });
-
-    // Logout function
-    function logout() {
-      // Add your logout logic here
-      window.location.href = 'login.html';
-    }
-
-
-    // Add this to your existing JavaScript
-    document.addEventListener('DOMContentLoaded', function () {
-      const dropZone = document.querySelector('.upload-area');
-      const projectImages = new Set();
-
-      // Prevent default drag behaviors
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-        document.body.addEventListener(eventName, preventDefaults, false);
-      });
-
-      // Highlight drop zone when item is dragged over it
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, highlight, false);
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, unhighlight, false);
-      });
-      const uploadProfileImgBtn = document.querySelector("#uploadProfileImgBtn")
-      uploadProfileImgBtn.onclick = function () {
-        document.querySelector('#profilePhotoInput').click();
-      }
-      // Handle dropped files
-      dropZone.addEventListener('drop', handleDrop, false);
-
-      function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
-      function highlight(e) {
-        dropZone.classList.add('border-primary', 'bg-light');
-      }
-
-      function unhighlight(e) {
-        dropZone.classList.remove('border-primary', 'bg-light');
-      }
-
-      function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFiles(files);
-      }
-
-      function handleFiles(files) {
-        [...files].forEach(previewFile);
-      }
-
-      function previewFile(file) {
-        if (!file.type.startsWith('image/')) {
-          alert('Please upload only image files.');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = function () {
-          const img = document.createElement('img');
-          img.src = reader.result;
-          img.classList.add('img-thumbnail', 'm-2');
-          img.style.maxWidth = '150px';
-
-          const container = document.createElement('div');
-          container.classList.add('position-relative', 'd-inline-block');
-
-          const removeBtn = document.createElement('button');
-          removeBtn.innerHTML = '×';
-          removeBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'position-absolute', 'top-0', 'end-0');
-          removeBtn.onclick = function () {
-            container.remove();
-            projectImages.delete(file);
-          };
-
-          container.appendChild(img);
-          container.appendChild(removeBtn);
-
-          // Add preview container before the drop zone
-          dropZone.parentNode.insertBefore(container, dropZone);
-          projectImages.add(file);
-        }
-      }
-
-      // Also handle file input selection
-      dropZone.onclick = function () {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.multiple = true;
-        input.accept = 'image/*';
-        input.onchange = function () {
-          handleFiles(this.files);
-        };
-        input.click();
-      };
-    });
+  <script src="{% static "js/project_leader_dashboard.js" %}">
   </script>
 {% endblock extra_js %}

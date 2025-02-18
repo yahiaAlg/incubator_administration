@@ -1,30 +1,32 @@
+{% load static %}
+{% load django_bootstrap5 %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    {% load django_bootstrap5 %}
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}My Application{% endblock %}</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Project Management System{% endblock %}</title>
+    
     {% bootstrap_css %}
     {% block extra_css %}{% endblock %}
-  </head>
-  <body>
-    <header>
-      {% block header %}
-      <!-- Add default header or leave empty for child templates -->
-      {% endblock %}
-    </header>
-    <main>
-      {% include "partials/_alerts.html" %}
-      {% block content %}{% endblock %}
-    </main>
-    <footer class="text-center mt-4">
-      {% block footer %}
-      <p>&copy; 2025 UFAS1 Incubator </p>
-      {% endblock %}
-    </footer>
-    {% bootstrap_javascript %}
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    
+    <div class="container-fluid">
+      
+        <div class="row">
+            {% include 'partials/sidebar.html' %}
+            
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                {% include 'partials/messages.html' %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
 
+    {% bootstrap_javascript %}
+    <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
-  </body>
+</body>
 </html>

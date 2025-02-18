@@ -16,110 +16,8 @@
       href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"
       rel="stylesheet"
     />
-
-    <style>
-      .dashboard-header {
-        background: linear-gradient(
-          rgba(13, 110, 253, 0.9),
-          rgba(13, 110, 253, 0.7)
-        );
-        color: white;
-        padding: 2rem;
-        margin-bottom: 20px;
-      }
-
-      .stat-card {
-        border-radius: 15px;
-        border: none;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s;
-      }
-
-      .stat-card:hover {
-        transform: translateY(-5px);
-      }
-
-      .progress-sm {
-        height: 6px;
-      }
-
-      .project-table th {
-        white-space: nowrap;
-      }
-
-      .priority-badge {
-        width: 80px;
-        text-align: center;
-      }
-
-      .team-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        margin-left: -10px;
-        border: 2px solid white;
-      }
-
-      .deadline-warning {
-        color: #dc3545;
-        animation: blink 1s infinite;
-      }
-
-      @keyframes blink {
-        50% {
-          opacity: 0.5;
-        }
-      }
-
-      .filter-section {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-      }
-
-      .form-section {
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      }
-
-      .required-field::after {
-        content: "*";
-        color: red;
-        margin-left: 4px;
-      }
-    </style>
-
-    <style>
-      .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .project-table {
-        width: 100%;
-        margin-bottom: 1rem;
-      }
-
-      .project-table th {
-        white-space: nowrap;
-        background-color: #f8f9fa;
-      }
-
-      .project-table td {
-        vertical-align: middle;
-      }
-
-      #exportCSV {
-        transition: all 0.3s;
-      }
-
-      #exportCSV:hover {
-        transform: translateY(-2px);
-      }
-    </style>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="table.css" />
   </head>
   <body>
     <!-- Main Content -->
@@ -492,6 +390,7 @@
     </div>
 
     <!-- Edit Project Modal -->
+    <!-- Edit Project Modal -->
     <div class="modal fade" id="editProjectModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -514,13 +413,19 @@
                       <label class="form-label required-field"
                         >Project Name</label
                       >
-                      <input type="text" class="form-control" required />
+                      <input
+                        type="text"
+                        id="projectName"
+                        class="form-control"
+                        required
+                      />
                     </div>
                     <div class="col-md-12">
                       <label class="form-label required-field"
                         >Description</label
                       >
                       <textarea
+                        id="description"
                         class="form-control"
                         rows="3"
                         required
@@ -530,11 +435,21 @@
                       <label class="form-label required-field"
                         >Start Date</label
                       >
-                      <input type="date" class="form-control" required />
+                      <input
+                        type="date"
+                        id="startDate"
+                        class="form-control"
+                        required
+                      />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label required-field">End Date</label>
-                      <input type="date" class="form-control" required />
+                      <input
+                        type="date"
+                        id="endDate"
+                        class="form-control"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
@@ -545,7 +460,7 @@
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label required-field">Priority</label>
-                      <select class="form-select" required>
+                      <select id="priority" class="form-select" required>
                         <option value="">Select Priority</option>
                         <option>High</option>
                         <option>Medium</option>
@@ -554,7 +469,7 @@
                     </div>
                     <div class="col-md-6">
                       <label class="form-label required-field">Status</label>
-                      <select class="form-select" required>
+                      <select id="status" class="form-select" required>
                         <option value="">Select Status</option>
                         <option>Active</option>
                         <option>On Hold</option>
@@ -572,7 +487,7 @@
                       <label class="form-label required-field"
                         >Team Leader</label
                       >
-                      <select class="form-select" required>
+                      <select id="teamLeader" class="form-select" required>
                         <option value="">Select Team Leader</option>
                         <option>John Doe</option>
                         <option>Jane Smith</option>
@@ -580,7 +495,7 @@
                     </div>
                     <div class="col-md-6">
                       <label class="form-label">Team Members</label>
-                      <select class="form-select" multiple>
+                      <select id="teamMembers" class="form-select" multiple>
                         <option>Alice Johnson</option>
                         <option>Bob Wilson</option>
                         <option>Carol Martinez</option>
@@ -588,6 +503,7 @@
                     </div>
                   </div>
                 </div>
+
                 <!-- Additional Information Section -->
                 <div class="col-md-12">
                   <h6 class="mb-3">Additional Information</h6>
@@ -595,7 +511,7 @@
                     <!-- Faculty and Specialty -->
                     <div class="col-md-6">
                       <label class="form-label required-field">Faculty</label>
-                      <select class="form-select" required>
+                      <select id="faculty" class="form-select" required>
                         <option value="">Select Faculty</option>
                         <option>Engineering</option>
                         <option>Science</option>
@@ -608,7 +524,7 @@
                     </div>
                     <div class="col-md-6">
                       <label class="form-label required-field">Specialty</label>
-                      <select class="form-select" required>
+                      <select id="specialty" class="form-select" required>
                         <option value="">Select Specialty</option>
                         <option>Software Engineering</option>
                         <option>Civil Engineering</option>
@@ -627,13 +543,14 @@
                       <label class="form-label">Budget</label>
                       <input
                         type="number"
+                        id="budget"
                         class="form-control"
                         placeholder="Enter budget"
                       />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label">Department</label>
-                      <select class="form-select">
+                      <select id="department" class="form-select">
                         <option value="">Select Department</option>
                         <option>IT</option>
                         <option>Marketing</option>
@@ -648,6 +565,7 @@
                     <div class="col-md-12">
                       <label class="form-label">Notes</label>
                       <textarea
+                        id="notes"
                         class="form-control"
                         rows="3"
                         placeholder="Additional notes..."
@@ -665,6 +583,13 @@
               data-bs-dismiss="modal"
             >
               Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="downloadPDF()"
+            >
+              Download PDF
             </button>
             <button
               type="submit"
@@ -715,83 +640,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-
-    <script>
-      // Initialize DataTable
-      $(document).ready(function () {
-        $("#projectsTable").DataTable({
-          responsive: true,
-          order: [[0, "asc"]],
-          pageLength: 10,
-          language: {
-            search: "Search: ",
-            lengthMenu: "Show _MENU_ entries per page",
-            info: "Showing _START_ to _END_ of _TOTAL_ projects",
-          },
-        });
-      });
-
-      // Form validation
-      document
-        .getElementById("addProjectForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          // Add your form submission logic here
-        });
-
-      document
-        .getElementById("editProjectForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          // Add your form submission logic here
-        });
-    </script>
-
-    <script>
-      // Initialize DataTable with modified columns
-      $(document).ready(function () {
-        const table = $("#projectsTable").DataTable({
-          responsive: true,
-          order: [[0, "asc"]],
-          pageLength: 10,
-          language: {
-            search: "Search: ",
-            lengthMenu: "Show _MENU_ entries per page",
-            info: "Showing _START_ to _END_ of _TOTAL_ projects",
-          },
-        });
-
-        // CSV Export functionality
-        $("#exportCSV").on("click", function () {
-          // Create CSV content
-          let csv = "Project Name,Team Leader,Start Date,Status\n";
-
-          // Get all data from DataTable
-          const data = table.rows().data();
-
-          data.each(function (row) {
-            // Clean and format the data
-            const projectName = row[0].replace(/,/g, " ");
-            const teamLeader = row[1].replace(/,/g, " ");
-            const startDate = row[2];
-            // Extract status text from span element
-            const status = $(row[3]).text();
-
-            csv += `${projectName},${teamLeader},${startDate},${status}\n`;
-          });
-
-          // Create download link
-          const blob = new Blob([csv], { type: "text/csv" });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.setAttribute("hidden", "");
-          a.setAttribute("href", url);
-          a.setAttribute("download", "projects_export.csv");
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        });
-      });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/polyfills.umd.js"></script>
+    <script src="./index.js"></script>
+    <script src="./index_form_validation.js"></script>
+    <script src="./csv_export.js"></script>
   </body>
 </html>

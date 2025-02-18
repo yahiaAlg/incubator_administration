@@ -1,0 +1,159 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Edit Project</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <form id="editProjectForm" class="form-section">
+        <div class="row g-3">
+          <!-- Basic Information -->
+          <div class="col-md-12">
+            <h6 class="mb-3">Basic Information</h6>
+            <div class="row g-3">
+              <div class="col-md-12">
+                <label class="form-label required-field">Project Name</label>
+                <input type="text" class="form-control" required="" />
+              </div>
+              <div class="col-md-12">
+                <label class="form-label required-field">Description</label>
+                <textarea class="form-control" rows="3" required=""></textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required-field">Start Date</label>
+                <input type="date" class="form-control" required="" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required-field">End Date</label>
+                <input type="date" class="form-control" required="" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Details -->
+          <div class="col-md-12">
+            <h6 class="mb-3">Project Details</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label required-field">Priority</label>
+                <select class="form-select" required="">
+                  <option value="">Select Priority</option>
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required-field">Status</label>
+                <select class="form-select" required="">
+                  <option value="">Select Status</option>
+                  <option>Active</option>
+                  <option>On Hold</option>
+                  <option>Completed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Information -->
+          <div class="col-md-12">
+            <h6 class="mb-3">Team Information</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label required-field">Team Leader</label>
+                <select class="form-select" required="">
+                  <option value="">Select Team Leader</option>
+                  <option>John Doe</option>
+                  <option>Jane Smith</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Team Members</label>
+                <select class="form-select" multiple="">
+                  <option>Alice Johnson</option>
+                  <option>Bob Wilson</option>
+                  <option>Carol Martinez</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- Additional Information Section -->
+          <div class="col-md-12">
+            <h6 class="mb-3">Additional Information</h6>
+            <div class="row g-3">
+              <!-- Faculty and Specialty -->
+              <div class="col-md-6">
+                <label class="form-label required-field">Faculty</label>
+                <select class="form-select" required="">
+                  <option value="">Select Faculty</option>
+                  <option>Engineering</option>
+                  <option>Science</option>
+                  <option>Business</option>
+                  <option>Arts</option>
+                  <option>Medicine</option>
+                  <option>Law</option>
+                  <option>Education</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required-field">Specialty</label>
+                <select class="form-select" required="">
+                  <option value="">Select Specialty</option>
+                  <option>Software Engineering</option>
+                  <option>Civil Engineering</option>
+                  <option>Mechanical Engineering</option>
+                  <option>Computer Science</option>
+                  <option>Information Technology</option>
+                  <option>Data Science</option>
+                  <option>Business Administration</option>
+                  <option>Finance</option>
+                  <option>Marketing</option>
+                </select>
+              </div>
+
+              <!-- Budget and Department -->
+              <div class="col-md-6">
+                <label class="form-label">Budget</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Enter budget"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Department</label>
+                <select class="form-select">
+                  <option value="">Select Department</option>
+                  <option>IT</option>
+                  <option>Marketing</option>
+                  <option>Operations</option>
+                  <option>Research &amp; Development</option>
+                  <option>Human Resources</option>
+                  <option>Finance</option>
+                </select>
+              </div>
+
+              <!-- Notes -->
+              <div class="col-md-12">
+                <label class="form-label">Notes</label>
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  placeholder="Additional notes..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        Cancel
+      </button>
+      <button type="submit" form="editProjectForm" class="btn btn-primary">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>

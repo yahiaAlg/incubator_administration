@@ -1,0 +1,47 @@
+<div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Team Members</h5>
+                    {% if team_member.is_project_leader %}
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                        <i class="bi bi-plus-lg me-2"></i>Add Member
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        {% for member in team_members %}
+                        <div class="col-md-4">
+                            <div class="card member-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="{{ member.photo.url|default:'https://via.placeholder.com/50' }}" class="rounded-circle me-3" alt="Member" />
+                                        <div>
+                                            <h6 class="mb-0">{{ member.user.get_full_name }}</h6>
+                                            <small class="text-muted">{{ member.role }}</small>
+                                        </div>
+                                    </div>
+                                    <p class="card-text">
+                                        <i class="bi bi-envelope me-2"></i>{{ member.user.email }}<br />
+                                        <i class="bi bi-phone me-2"></i>{{ member.phone }}
+                                    </p>
+                                    {% if team_member.is_project_leader %}
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMemberModal" 
+                                                data-member-id="{{ member.id }}">
+                                            <i class="bi bi-pencil me-2"></i>Edit Member
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

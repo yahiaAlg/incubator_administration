@@ -27,6 +27,11 @@ document.querySelector(".upload-area").addEventListener("drop", function (e) {
   // Handle file upload
 });
 
+// Logout function
+function logout() {
+  // Add your logout logic here
+  window.location.href = "login.html";
+}
 
 // Add this to your existing JavaScript
 document.addEventListener("DOMContentLoaded", function () {

@@ -1,42 +1,39 @@
 from django.urls import path
 from . import views
-
-# import LoginView as view to make use of it from auth views
-from django.contrib.auth import views as auth_views
-
+from django.contrib.auth.views import LoginView
 
 urlpatterns = [
+    path("", views.dashboard, name="dashboard"),
+    path("update-profile/", views.update_profile, name="update_profile"),
+    path("add-team-member/", views.add_team_member, name="add_team_member"),
     path(
-        "",
-        auth_views.LoginView.as_view(template_name="accounts/login.html"),
-        name="login",
+        "update-team-member/<int:member_id>/",
+        views.update_team_member,
+        name="update_team_member",
+    ),
+    path("update-project/", views.update_project, name="update_project"),
+    path(
+        "request-material/<int:material_id>/",
+        views.request_material,
+        name="request_material",
     ),
     path(
-        "logout/",
-        auth_views.LogoutView.as_view(template_name="accounts/logout.html"),
-        name="logout",
-    ),
-    path("dashboard/", views.dashboard, name="dashboard"),
-    path("profile/update/", views.profile_update, name="profile_update"),
-    path("profile/change-password/", views.change_password, name="change_password"),
-    path(
-        "project/<int:project_id>/members/",
-        views.project_members,
-        name="project_members",
+        "return-material/<int:request_id>/",
+        views.return_material,
+        name="return_material",
     ),
     path(
-        "project/<int:project_id>/members/add/",
-        views.add_project_member,
-        name="add_project_member",
+        "delete-project-image/<int:image_id>/",
+        views.delete_project_image,
+        name="delete_project_image",
     ),
     path(
-        "project/member/<int:member_id>/remove/",
-        views.remove_project_member,
-        name="remove_project_member",
+        "delete-project-file/<int:file_id>/",
+        views.delete_project_file,
+        name="delete_project_file",
     ),
     path(
-        "project/member/<int:member_id>/update/",
-        views.update_project_member,
-        name="update_project_member",
+        "logout/", LoginView.as_view(template_name="accounts/login.html"), name="logout"
     ),
+    path("logout/", views.logout_view, name="logout"),
 ]

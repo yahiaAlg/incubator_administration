@@ -1,0 +1,196 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header p-4">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-md-center justify-content-md-between align-items-center">
+            <div class="mb-2">
+                <h1 class="display-5 mb-0">Projects Management</h1>
+                <p class="lead mb-0">Manage and track your projects</p>
+            </div>
+            <div>
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                    <i class="bi bi-plus-lg me-2"></i>New Project
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-3">
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <h6>Active Projects</h6>
+                    <h2>{{ active_projects_count }}</h2>
+                    <div class="progress progress-sm mt-2">
+                        <div class="progress-bar bg-white" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <h6>Completed Projects</h6>
+                    <h2>{{ completed_projects_count }}</h2>
+                    <div class="progress progress-sm mt-2">
+                        <div class="progress-bar bg-white" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-3">
+            <div class="card stat-card bg-dark text-white">
+                <div class="card-body">
+                    <h6>Labels Recieved</h6>
+                    <h2>{{ completed_projects_count }}</h2>
+                    <div class="progress progress-sm mt-2">
+                        <div class="progress-bar bg-white" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-3">
+            <div class="card stat-card bg-warning text-white">
+                <div class="card-body">
+                    <h6>Team Members</h6>
+                    <h2>{{ team_members_count }}</h2>
+                    <div class="progress progress-sm mt-2">
+                        <div class="progress-bar bg-white" style="width: 60%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-3">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body">
+                    <h6>Resources</h6>
+                    <h2>{{ materials_count }}</h2>
+                    <div class="progress progress-sm mt-2">
+                        <div class="progress-bar bg-white" style="width: 45%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section mb-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select">
+                    <option value="">All Status</option>
+                    {% for status in project_statuses %}
+                    <option value="{{ status }}">{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Faculty</label>
+                <select class="form-select">
+                    <option value="">All Faculties</option>
+                    {% for faculty in faculties %}
+                    <option value="{{ faculty.0 }}">{{ faculty.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Team Leader</label>
+                {% comment %} input text for searching the team leader {% endcomment %}
+                <select class="form-select" name="team_leaders" id="team_leader">
+                    
+                    <option value="0">select team leader</option>
+                </select>
+                
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input type="text" class="form-control" placeholder="Search projects..." />
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <button class="btn btn-success" id="exportCSV">
+                        <i class="bi bi-download me-2"></i>Export to CSV
+                    </button>
+                </div>
+                <div>
+                    <label>Show
+                        <select class="form-select form-select-sm d-inline-block w-auto">
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                        entries
+                    </label>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover project-table" id="projectsTable">
+                    <thead>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Team Leader</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'project_detail' project.id %}" class="link-primary">
+                                    {{ project.name }}
+                                </a>
+                            </td>
+                            <td>{{ project.team_leader.full_name }}</td>
+                            <td>{{ project.start_date|date:"M d, Y" }}</td>
+                            <td><span class="badge bg-info">{{ project.status }}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#editProjectModal-{{project.id}}" data-project-id="{{ project.id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteProjectModal-{{project.id}}" data-project-id="{{ project.id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "modals/add_project.html" %}
+{% for project in projects %}
+
+    {% include "modals/edit_project.html" with project=project %}
+    {% include "modals/delete_project.html" with project=project %}
+
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+    <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/index_form_validation.js' %}"></script>
+    <script src="{% static 'js/csv_export.js' %}"></script>
+{% endblock %}

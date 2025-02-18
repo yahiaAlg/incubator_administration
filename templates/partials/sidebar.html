@@ -1,0 +1,23 @@
+<nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+    <div class="position-sticky pt-3">
+        <div class="user-profile text-center mb-4">
+            <img src="{{ team_member.photo.url }}" class="rounded-circle" alt="Profile">
+            <h6 class="mt-2">{{ team_member.user.get_full_name }}</h6>
+            <p class="text-muted">{{ team_member.role }}</p>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#materials">Materials</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#team">Team</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#project">Project</a>
+            </li>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,82 @@
+<div class="tab-pane fade" id="materials" role="tabpanel" aria-labelledby="materials-tab">
+    <div class="row">
+        <!-- Available Materials Section -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Available Materials</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        {% for material in available_materials %}
+                        <div class="col-md-4">
+                            <div class="card material-card">
+                                <div class="card-body">
+                                    <span class="badge bg-success position-absolute top-0 end-0 mt-2 me-2">
+                                        {{ material.get_status_display }}
+                                    </span>
+                                    <h5 class="card-title">{{ material.name }}</h5>
+                                    <p class="card-text text-muted">{{ material.description }}</p>
+                                    {% if team_member.is_permitted_to_demand %}
+                                    <form method="post" action="{% url 'request_material' material.id %}">
+                                        {% csrf_token %}
+                                        {% bootstrap_form material_request_form %}
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-plus-circle me-2"></i>Request Material
+                                            </button>
+                                        </div>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Materials Section -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">My Materials</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Acquired Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in material_requests %}
+                                <tr>
+                                    <td>{{ request.material.name }}</td>
+                                    <td>{{ request.acquired_date }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Active</span>
+                                    </td>
+                                    <td>
+                                        <form method="post" action="{% url 'return_material' request.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-arrow-return-left me-1"></i>Return
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

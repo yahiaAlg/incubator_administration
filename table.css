@@ -1,0 +1,26 @@
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.project-table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.project-table th {
+  white-space: nowrap;
+  background-color: #f8f9fa;
+}
+
+.project-table td {
+  vertical-align: middle;
+}
+
+#exportCSV {
+  transition: all 0.3s;
+}
+
+#exportCSV:hover {
+  transform: translateY(-2px);
+}

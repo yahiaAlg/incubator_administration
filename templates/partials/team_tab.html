@@ -16,23 +16,27 @@
                         <div class="col-md-4">
                             <div class="card member-card">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <img src="{{ member.photo.url|default:'https://via.placeholder.com/50' }}" class="rounded-circle me-3" alt="Member" />
+                                    <div class="d-flex flex-column justify-content-center align-items-center mb-3">
+                                        <img src="{{ member.photo.url|default:'https://via.placeholder.com/50' }}" class="rounded-circle" alt="Member" />
                                         <div>
                                             <h6 class="mb-0">{{ member.user.get_full_name }}</h6>
                                             <small class="text-muted">{{ member.role }}</small>
                                         </div>
                                     </div>
-                                    <p class="card-text">
+                                    <p class="card-text text-center">
                                         <i class="bi bi-envelope me-2"></i>{{ member.user.email }}<br />
                                         <i class="bi bi-phone me-2"></i>{{ member.phone }}
                                     </p>
                                     {% if team_member.is_project_leader %}
                                     <div class="btn-group w-100">
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMemberModal" 
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMemberModal-{{member.id}}" 
                                                 data-member-id="{{ member.id }}">
                                             <i class="bi bi-pencil me-2"></i>Edit Member
                                         </button>
+
+
+                                        {% include 'partials/modals/edit_member_modal.html' with member=member %}
+
                                     </div>
                                     {% endif %}
                                 </div>

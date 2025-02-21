@@ -59,7 +59,7 @@ class MaterialRequest(models.Model):
     to_date = models.DateField(auto_now=False, auto_now_add=False)
 
     def __str__(self):
-        return f"{self.material.name} - {self.user.username}"
+        return f"{self.material.name} - {self.project.name}"
 
 
 class Faculty(models.Model):
@@ -73,7 +73,7 @@ class Faculty(models.Model):
         verbose_name_plural = "faculties"
 
     def __str__(self):
-        return self.name
+        return self.abreviated_name
 
     def get_absolute_url(self):
         return reverse("faculty_detail", kwargs={"pk": self.pk})
@@ -90,7 +90,7 @@ class Department(models.Model):
         verbose_name_plural = "departments"
 
     def __str__(self):
-        return self.name
+        return self.abreviated_name
 
     def get_absolute_url(self):
         return reverse("department_detail", kwargs={"pk": self.pk})
@@ -107,7 +107,7 @@ class Speciality(models.Model):
         verbose_name_plural = "specialities"
 
     def __str__(self):
-        return self.name
+        return self.abreviated_name
 
     def get_absolute_url(self):
         return reverse("speciality_detail", kwargs={"pk": self.pk})
@@ -146,13 +146,13 @@ class TeamMember(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
     faculty = models.ForeignKey(
-        Faculty, on_delete=models.SET_NULL, null=True, default=True
+        Faculty, on_delete=models.SET_NULL, null=True, blank=True
     )
     department = models.ForeignKey(
-        Department, on_delete=models.SET_NULL, null=True, default=True
+        Department, on_delete=models.SET_NULL, null=True, blank=True
     )
     speciality = models.ForeignKey(
-        Speciality, on_delete=models.SET_NULL, null=True, default=True
+        Speciality, on_delete=models.SET_NULL, null=True, blank=True
     )
 
     def __str__(self):

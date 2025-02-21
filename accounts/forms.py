@@ -1,5 +1,7 @@
 from django import forms
 from .models import *
+from django.contrib.auth.forms import UserCreationForm 
+from django.contrib.auth.models import User
 
 
 class ProjectForm(forms.ModelForm):
@@ -15,6 +17,8 @@ class ProjectForm(forms.ModelForm):
             "status",
         ]
         widgets = {
+            # range form for the progress with class form-range
+            "progress": forms.NumberInput(attrs={"class": "form-range"}),
             "start_date": forms.DateInput(attrs={"type": "date"}),
             "deadline": forms.DateInput(attrs={"type": "date"}),
             "description": forms.Textarea(attrs={"rows": 4}),
@@ -58,14 +62,25 @@ class SpecialityForm(forms.ModelForm):
         fields = ["arabic_name", "latin_name", "abreviated_name"]
 
 
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField()  # Add email field
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User 
+        fields = ['username', 'email']
+
 class TeamMemberForm(forms.ModelForm):
     class Meta:
         model = TeamMember
         fields = [
-            "project",
-            "user",
-            "is_project_leader",
-            "is_permitted_to_demand",
+            
             "photo",
             "phone",
             "bio",
@@ -111,6 +126,10 @@ class ProjectUpdateForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ["progress", "status"]
+        widgets = {
+            "progress": forms.Select(attrs={"class": "form-range"}),
+            "status": forms.Select(attrs={"class": "form-control"}),
+        }
 
 
 class TeamMemberUpdateForm(forms.ModelForm):

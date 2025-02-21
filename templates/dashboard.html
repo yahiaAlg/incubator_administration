@@ -7,83 +7,90 @@
 {% endblock %}
 {% block content %}
 
-
-      <!-- Tab Navigation -->
-      <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+    {% include 'partials/navbar.html' %}
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button
+        <button
             class="nav-link active"
             id="profile-tab"
             data-bs-toggle="tab"
             data-bs-target="#profile"
             type="button"
             role="tab"
-          >
+        >
             <i class="bi bi-person me-2"></i>Profile
-          </button>
+        </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button
+        <button
             class="nav-link"
             id="materials-tab"
             data-bs-toggle="tab"
             data-bs-target="#materials"
             type="button"
             role="tab"
-          >
+        >
             <i class="bi bi-box me-2"></i>Materials
-          </button>
+        </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button
+        <button
             class="nav-link"
             id="team-tab"
             data-bs-toggle="tab"
             data-bs-target="#team"
             type="button"
             role="tab"
-          >
+        >
             <i class="bi bi-people me-2"></i>Team
-          </button>
+        </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button
+        <button
             class="nav-link"
             id="project-tab"
             data-bs-toggle="tab"
             data-bs-target="#project"
             type="button"
             role="tab"
-          >
+        >
             <i class="bi bi-clipboard-data me-2"></i>Project
-          </button>
+        </button>
         </li>
-      </ul>
+    </ul>
 
 
     <!-- Tab Content -->
     <div class="tab-content" id="dashboardTabContent">
-        <!-- Profile Tab -->
-        {% include 'partials/profile_tab.html' %}
-        
-        <!-- Materials Tab -->
-        {% include 'partials/materials_tab.html' %}
-        
-        <!-- Team Tab -->
-        {% include 'partials/team_tab.html' %}
-        
-        <!-- Project Tab -->
-        {% include 'partials/project_tab.html' %}
+        <main class="container-fluid">
+            {% include 'partials/messages.html' %}
+
+            <!-- Profile Tab -->
+            {% include 'partials/profile_tab.html' %}
+            
+            <!-- Materials Tab -->
+            
+            {% include 'partials/materials_tab.html' %}
+            
+            <!-- Team Tab -->
+            {% include 'partials/team_tab.html' %}
+            
+            <!-- Project Tab -->
+            {% include 'partials/project_tab.html' %}
+        <main>
+
     </div>
 
 
     {% include 'partials/modals/add_member_modal.html' %}
-    {% include 'partials/modals/edit_member_modal.html' %}
     {% include 'partials/modals/edit_profile_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    <script src="{% static 'js/main.js' %}"></script>
+    {% comment %} <script src="{% static 'js/main.js' %}"></script> {% endcomment %}
+
+    
 </script>
 {% endblock %}

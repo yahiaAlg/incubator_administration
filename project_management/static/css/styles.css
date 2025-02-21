@@ -58,3 +58,10 @@
     border-color: #0d6efd;
     background-color: #f8f9fa;
 }
+
+
+
+img[alt~="Profile"],img[alt~="Member"] {
+    width:7rem;
+    height:7rem;
+}

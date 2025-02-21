@@ -1,3 +1,4 @@
+{% load django_bootstrap5 %}
 <div class="modal fade" id="addMemberModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -8,6 +9,7 @@
             <div class="modal-body">
                 <form method="post" action="{% url 'add_team_member' %}" id="addMemberForm">
                     {% csrf_token %}
+                    {% bootstrap_form user_creation_form %}
                     {% bootstrap_form team_member_form %}
                 </form>
             </div>

@@ -3,20 +3,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
 import random
-from ...models import (
-    Project,
-    Material,
-    MaterialRequest,
-    Faculty,
-    Department,
-    Speciality,
-    TeamMember,
-    ProjectImage,
-    Plan,
-    Phase,
-    Task,
-    Event,
-)
+from django.db.models.signals import post_save
+from ...models import *
 
 
 class Command(BaseCommand):
@@ -24,6 +12,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Seeding data...")
+
+        # Temporarily disconnect the signal
+        from ...models import create_team_member, save_team_member
+
+        post_save.disconnect(create_team_member, sender=User)
+        post_save.disconnect(save_team_member, sender=User)
 
         # Create basic entities
         faculty = Faculty.objects.create(
@@ -84,7 +78,7 @@ class Command(BaseCommand):
                 project=project, image="default_image_placeholder.png"
             )
 
-            # Create team members
+            # Create user and update their team member
             user = User.objects.create_user(
                 username=f"user{i+1}",
                 password="password123",
@@ -141,5 +135,9 @@ class Command(BaseCommand):
                         description=f"Event description for task {k+1}",
                         task=task,
                     )
+
+        # Reconnect the signal
+        post_save.connect(create_team_member, sender=User)
+        post_save.connect(save_team_member, sender=User)
 
         self.stdout.write(self.style.SUCCESS("Successfully seeded database"))

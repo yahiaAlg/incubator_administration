@@ -1,3 +1,4 @@
+{% load django_bootstrap5 %}
 <div class="modal fade" id="editProfileModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -9,7 +10,7 @@
                 <form method="post" action="{% url 'update_profile' %}" id="editProfileForm" class="row g-3" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="col-12 text-center mb-3">
-                        <img src="{{ team_member.photo.url|default:'https://via.placeholder.com/150' }}" class="rounded-circle mb-3" alt="Profile Picture" />
+                        <img src="{{ team_member.photo.url|default:'https://via.placeholder.com/150' }}" class="rounded-circle mb-3" alt="Profile Picture" style="width:7rem;height:7rem;" />
                         <div>
                             <button type="button" class="btn btn-outline-primary btn-sm" id="uploadProfileImgBtn">
                                 <i class="bi bi-camera me-2"></i>Change Photo
